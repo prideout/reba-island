@@ -6,6 +6,6 @@
         "frequencies": [3.0, 10.0, 20.0],
         "amplitudes": [0.1, 0.05, 0.025]
     },
-    "seed": 4,
+    "seed": 7,
     "sealevel": 0.4
 }

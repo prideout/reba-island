@@ -5,6 +5,11 @@
 #include <rapidjson/document.h>
 #include <glm/gtc/noise.hpp>
 
+namespace edt {
+    #include <felzenszwalb/misc.h>
+    #include <felzenszwalb/dt.h>
+}
+
 using namespace OIIO;
 using namespace glm;
 using namespace std;
@@ -35,8 +40,28 @@ void render(array_view<float> buffer, int width, int height)
             m += noise_ampl[i] * simplex(uv * noise_freq[i]);
         }
 
-        // Transform the result.
-        *ptr++ = m < sealevel ? 1.0f : 0.0f;
+        // Apply the step function.
+        m -= sealevel;
+        *ptr++ = m < 0.0f ? INF : 0;
+    } }
+
+    // Compute a distance field.
+    int num_bytes = width * height * sizeof(float);
+    edt::image<float> distance_field(width, height, true);
+    memcpy(distance_field.data, buffer.data(), num_bytes);
+    edt::dt(&distance_field);
+
+    // Draw radiating lines.
+    float* src = distance_field.data;
+    float* dst = buffer.data();
+    for (int y = 0; y < height; ++y) {
+    for (int x = 0; x < width; ++x) {
+        float s = *src++;
+        float& d = *dst++;
+        s = sqrt(s) * coord_scale;
+        if (d > 0.0f) {
+            d = 1.0f - float(int(s * 100.0) % 2) / (s * 100.0f);
+        }
     } }
 }
 

@@ -1,6 +1,6 @@
 This is a simple image generator that demonstrates how to use the [Reba](_) machine image.  It generates monochrome island shapes that look like this:
 
-TBD
+![](https://github.com/prideout/reba-island/blob/master/islands.png)
 
 ---
 

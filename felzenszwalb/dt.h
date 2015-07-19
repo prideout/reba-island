@@ -94,7 +94,7 @@ static void dt(image<float> *im) {
 
 
 /* dt of binary image using squared distance */
-static image<float> *dt(image<uchar> *im, uchar on = 1) {
+image<float> *dt(image<uchar> *im, uchar on = 1) {
   int width = im->width();
   int height = im->height();
 

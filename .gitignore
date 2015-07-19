@@ -4,3 +4,4 @@ bin
 *.exr
 mitsuba.*.log
 .sconsign.dblite
+.DS_Store
