@@ -1,4 +1,4 @@
-This is a simple image generator that demonstrates how to use the [Reba](_) machine image.  It generates monochrome island shapes that look like this:
+This is a simple image generator that demonstrates how to use the [Reba](https://github.com/prideout/reba) machine image.  It creates grayscale island shapes that look like this:
 
 ![](https://github.com/prideout/reba-island/blob/master/islands.png)
 
