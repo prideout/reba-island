@@ -9,7 +9,12 @@ using namespace OIIO;
 using namespace glm;
 using namespace std;
 
-static float noise_freq;
+#define NUM_OCTAVES 3
+
+static float noise_freq[NUM_OCTAVES];
+static float noise_ampl[NUM_OCTAVES];
+static float sealevel;
+static float seed;
 
 void render(array_view<float> buffer, int width, int height)
 {
@@ -21,11 +26,17 @@ void render(array_view<float> buffer, int width, int height)
         // Create a normalized texture coordinate.
         vec2 uv = vec2(x, y) * coord_scale;
 
-        // Evaluate the noise function.
-        float n = simplex(uv * noise_freq);
+        // Poor man's distance field.
+        float m = 0.707 - distance(uv, vec2(0.5));
 
-        // Transform the result from [-1, +1] to [0, 1].
-        *ptr++ = 0.5 + 0.5 * n;
+        // Each noise function gets back a value in [-1, +1].
+        uv += vec2(seed);
+        for (int i = 0; i < NUM_OCTAVES; i++) {
+            m += noise_ampl[i] * simplex(uv * noise_freq[i]);
+        }
+
+        // Transform the result.
+        *ptr++ = m < sealevel ? 1.0f : 0.0f;
     } }
 }
 
@@ -59,7 +70,13 @@ int main(int argc, char** argv)
     const auto img_filename = terra["filename"].GetString();
     const int img_width = terra["width"].GetInt();
     const int img_height = terra["height"].GetInt();
-    noise_freq = terra["frequency"].GetDouble();
+    const rapidjson::Value& noise = terra["noise_octaves"];
+    for (int i = 0; i < NUM_OCTAVES; i++) {
+        noise_freq[i] = noise["frequencies"][i].GetDouble();
+        noise_ampl[i] = noise["amplitudes"][i].GetDouble();
+    }
+    sealevel = terra["sealevel"].GetDouble();
+    seed = terra["seed"].GetDouble();
 
     // Allocate and populate pixels.
     float pixels[img_width * img_height * kNumChannels];

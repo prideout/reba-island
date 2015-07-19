@@ -2,5 +2,10 @@
     "filename": "elevation.png",
     "width": 512,
     "height": 512,
-    "frequency": 64.0
+    "noise_octaves": {
+        "frequencies": [3.0, 10.0, 20.0],
+        "amplitudes": [0.1, 0.05, 0.025]
+    },
+    "seed": 4,
+    "sealevel": 0.4
 }
