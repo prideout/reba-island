@@ -1,4 +1,3 @@
-#include <fstream>
 #include <spdlog/spdlog.h>
 #include <OpenImageIO/imageio.h>
 #include <OpenImageIO/array_view.h>
@@ -21,7 +20,7 @@ static float noise_ampl[NUM_OCTAVES];
 static float sealevel;
 static float seed;
 
-void render(array_view<float> buffer, int width, int height)
+static void render(array_view<float> buffer, int width, int height)
 {
     const float coord_scale = 1.0f / width;
     float* ptr = buffer.data();
@@ -65,43 +64,27 @@ void render(array_view<float> buffer, int width, int height)
     } }
 }
 
-int main(int argc, char** argv)
+int generate_island(const string& json_string)
 {
-    auto console = spdlog::stdout_logger_mt("console");
-    const char* kProcessName = argv[0];
-    const char* kJsonFilename = argv[1];
+    auto console = spdlog::get("console");
     const int kNumChannels = 1;
 
-    if (argc != 2) {
-        console->error("usage: {} example.json\n", kProcessName);
+    rapidjson::Document doc;
+    doc.Parse(json_string.c_str());
+    if (doc.HasParseError()) {
+        console->error("Failed to parse JSON: {}\n", doc.GetParseError());
         return 1;
     }
-
-    // Parse the JSON file.
-    ifstream json_in(kJsonFilename);
-    if (not json_in) {
-        console->error("Could not open {}.\n", kJsonFilename);
-        return 1;
-    }
-    istreambuf_iterator<char> begin(json_in);
-    istreambuf_iterator<char> end;
-    const string json_string(begin, end);
-    rapidjson::Document terra;
-    terra.Parse(json_string.c_str());
-    if (terra.HasParseError()) {
-        console->error("Failed to parse JSON: {}\n", terra.GetParseError());
-        return 1;
-    }
-    const auto img_filename = terra["filename"].GetString();
-    const int img_width = terra["width"].GetInt();
-    const int img_height = terra["height"].GetInt();
-    const rapidjson::Value& noise = terra["noise_octaves"];
+    const auto img_filename = doc["filename"].GetString();
+    const int img_width = doc["width"].GetInt();
+    const int img_height = doc["height"].GetInt();
+    const rapidjson::Value& noise = doc["noise_octaves"];
     for (int i = 0; i < NUM_OCTAVES; i++) {
         noise_freq[i] = noise["frequencies"][i].GetDouble();
         noise_ampl[i] = noise["amplitudes"][i].GetDouble();
     }
-    sealevel = terra["sealevel"].GetDouble();
-    seed = terra["seed"].GetDouble();
+    sealevel = doc["sealevel"].GetDouble();
+    seed = doc["seed"].GetDouble();
 
     // Allocate and populate pixels.
     float pixels[img_width * img_height * kNumChannels];
@@ -123,4 +106,5 @@ int main(int argc, char** argv)
     out->close();
     delete out;
     console->info("{} has been written.\n", img_filename);
+    return 0;
 }

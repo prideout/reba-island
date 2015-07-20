@@ -28,5 +28,11 @@ reba
 Type the following commands in your Reba instance to build and run the example renderer:
 ```bash
 scons
-bin/island example.json
+build/genisland example.json
+```
+
+You can also run unit tests for the Python bindings:
+```
+scons install
+py.test
 ```
