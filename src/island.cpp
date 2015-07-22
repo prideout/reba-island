@@ -105,6 +105,6 @@ int generate_island(const string& json_string)
     out->write_image(TypeDesc::FLOAT, pixels);
     out->close();
     delete out;
-    console->info("{} has been written.\n", img_filename);
+    console->info("{} has been written.", img_filename);
     return 0;
 }

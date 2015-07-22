@@ -60,4 +60,4 @@ Hit Ctrl-C to quit.
 
 ```
 
-Now, you should see something when entering `localhost:8082/hello` into a browser on your mac.
+Now, you should see something when entering `localhost:8082` into a browser on your mac.
