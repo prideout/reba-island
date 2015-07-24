@@ -8,7 +8,7 @@ import island
 
 @get('/')
 def get_root():
-    return "Try doing a POST to /render."
+    return "Welcome!  Try doing a POST to /render."
 
 
 @post('/render')

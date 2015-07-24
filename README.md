@@ -4,28 +4,28 @@ This is a simple image generator that demonstrates how to use the [Reba](https:/
 
 ---
 
-**How to build and run.**
+**How to build and run on OS X.**
 
-First, build the Reba machine image:
+First, install `boot2docker` if you haven't already.
 
-```bash
-cd ~/git
-git clone git@github.com:prideout/reba.git
-cd reba
-./reba-build
-```
-
-Next, clone this repo and attach to a Reba instance:
+Next, clone this repo and build the machine image:
 
 ```bash
 cd ~/git
 git clone git@github.com:prideout/reba-island.git
 cd reba-island
 . env.sh
-reba
 ```
 
-Type the following commands in your Reba instance to build and run the example renderer:
+The script you just ran not only invoked `docker` to build your machine image, it also created an alias that lets you quickly attach to it.  Trying attaching to it now:
+
+```
+island-bash
+```
+
+Push return a few times to see a prompt.  You should be in the `/island` folder in your Linux instance.
+
+Type the following commands inside your instance to build and run the example renderer:
 ```bash
 scons
 build/genisland test/example.json
@@ -39,7 +39,7 @@ py.test
 
 **How to start the render server.**
 
-First, forward 8082 from your mac to the VirtualBox host’s port.
+First, forward 8082 from your mac to the VirtualBox host’s port, which can be done like this:
 
 ```bash
 VBoxManage controlvm "boot2docker-vm" natpf1 "tcp-port8082,tcp,,8082,,8082"
@@ -60,4 +60,4 @@ Hit Ctrl-C to quit.
 
 ```
 
-Now, you should see something when entering `localhost:8082` into a browser on your mac.
+Now, you should see a welcome message when entering `localhost:8082` into a browser on your mac.
