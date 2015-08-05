@@ -46,23 +46,34 @@ static void render(array_view<float> buffer, int width, int height)
         *ptr++ = m < 0.0f ? INF : 0;
     } }
 
-    // Compute a distance field.
-    int num_bytes = width * height * sizeof(float);
-    edt::image<float> distance_field(width, height, true);
-    memcpy(distance_field.data, buffer.data(), num_bytes);
-    edt::dt(&distance_field);
+    // First compute the "outer" distance field.
 
-    // Draw radiating lines.
-    float* src = distance_field.data;
-    float* dst = buffer.data();
+    edt::image<float> distance_field_ocean(width, height, true);
+    int num_bytes = width * height * sizeof(float);
+    memcpy(distance_field_ocean.data, buffer.data(), num_bytes);
+    edt::dt(&distance_field_ocean);
+
+    // Next compute the "inner" distance field.
+
+    edt::image<float> distance_field_land(width, height, true);
+    float* dst = distance_field_land.data;
+    const float* src = buffer.data();
     for (int y = 0; y < height; ++y) {
     for (int x = 0; x < width; ++x) {
-        float s = *src++;
-        float& d = *dst++;
-        s = sqrt(s) * coord_scale;
-        if (d > 0.0f) {
-            d = 1.0f - float(int(s * 100.0) % 2) / (s * 100.0f);
-        }
+        *dst++ = (*src++) ? 0 : INF;
+    } }
+    edt::dt(&distance_field_land);
+
+    // Finally, combine them into a signed distance field.
+
+    float* oceanptr = distance_field_ocean.data;
+    float* landptr = distance_field_land.data;
+    float* resultptr = buffer.data();
+    for (int y = 0; y < height; ++y) {
+    for (int x = 0; x < width; ++x) {
+        float ocean = sqrt(*oceanptr++) * coord_scale;
+        float land = sqrt(*landptr++) * coord_scale;
+        *resultptr++ = 0.5 + ocean - land;
     } }
 }
 

@@ -1,7 +1,7 @@
 {
-    "filename": "elevation.png",
+    "filename": "elevation.exr",
     "width": 512,
-    "height": 288,
+    "height": 512,
     "noise_octaves": {
         "frequencies": [3.0, 10.0, 20.0],
         "amplitudes": [0.1, 0.05, 0.025]
