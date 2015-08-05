@@ -22,16 +22,18 @@ static float seed;
 
 static void render(array_view<float> buffer, int width, int height)
 {
-    const float coord_scale = 1.0f / width;
+    const float coord_scale = 1.0f / height;
     float* ptr = buffer.data();
+    int hh = height / 2;
+    int hw = width / 2;
     for (int y = 0; y < height; ++y) {
     for (int x = 0; x < width; ++x) {
 
         // Create a normalized texture coordinate.
-        vec2 uv = vec2(x, y) * coord_scale;
+        vec2 uv = vec2(x - hw, y - hh) * coord_scale;
 
         // Poor man's distance field.
-        float m = 0.707 - distance(uv, vec2(0.5));
+        float m = 0.707 - distance(uv, vec2(0));
 
         // Each noise function gets back a value in [-1, +1].
         uv += vec2(seed);
